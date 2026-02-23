@@ -75,8 +75,7 @@ QVariant XModel_Streams::data(const QModelIndex &index, int nRole) const
                     result = QString::number(rec.nFileSize, 16);
                 } else if (nColumn == COLUMN_COMPRESSMETHOD) {
                     if (rec.mapProperties.contains(XBinary::FPART_PROP_HANDLEMETHOD1)) {
-                        XBinary::HANDLE_METHOD cm = (XBinary::HANDLE_METHOD)rec.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD1).toInt();
-                        result = XBinary::handleMethodToString(cm);
+                        result = XBinary::getHandleMethods(rec.mapProperties);
                     }
                 } else if (nColumn == COLUMN_UNCOMPRESSEDSIZE) {
                     if (rec.mapProperties.contains(XBinary::FPART_PROP_UNCOMPRESSEDSIZE)) {

@@ -92,7 +92,7 @@ QVariant XModel_ArchiveRecords::data(const QModelIndex &index, int nRole) const
                     } else if (fpartProp == XBinary::FPART_PROP_STREAMSIZE) {
                         result = rec.nStreamSize;
                     } else if (fpartProp == XBinary::FPART_PROP_HANDLEMETHOD1) {
-                        result = XBinary::handleMethodToString((XBinary::HANDLE_METHOD)rec.mapProperties.value(fpartProp).toInt());
+                        result = XBinary::getHandleMethods(rec.mapProperties);
                     }
                 }
 
