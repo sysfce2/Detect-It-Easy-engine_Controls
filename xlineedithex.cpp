@@ -287,7 +287,7 @@ void XLineEditHEX::setMode(_MODE mode) {
 //}
 
 void XLineEditHEX::setValue32_64(quint64 nValue, _MODE mode) {
-  if (nValue >= 0xFFFFFFFF) {
+  if (nValue > 0xFFFFFFFF) {
     setValue_uint64((quint64)nValue, mode);
   } else {
     setValue_uint32((quint32)nValue, mode);
@@ -382,7 +382,7 @@ void XLineEditHEX::setValue_Variant(const QVariant &variant) {
 
 QVariant XLineEditHEX::_getValue() { return m_vValue; }
 
-void XLineEditHEX::setMaxValue(qint64 nValue) {
+void XLineEditHEX::setMaxValue(quint64 nValue) {
   m_validator.setMaxValue(nValue);
 }
 
@@ -610,9 +610,10 @@ void XLineEditHEX::updateFont() {
     }
   }
 
-  if (bIsBold) {
-    _font.setBold(bIsBold);
-  }
+  // Unconditional: _font is seeded from the widget's CURRENT font, so a guarded
+  // setBold() could only ever turn bold on. Once a field had shown any non-zero
+  // value it stayed bold for the rest of the session, including after clear().
+  _font.setBold(bIsBold);
 
   // TODO another modes
 

@@ -23,7 +23,7 @@
 XLineEditValidator::XLineEditValidator(QObject *pParent) : QValidator(pParent)
 {
     m_mode = MODE_HEX_32;
-    m_nMaxValue = 0x7FFFFFFFFFFFFFFF;
+    m_nMaxValue = 0xFFFFFFFFFFFFFFFFull;  // no limit until a caller sets one
 }
 
 void XLineEditValidator::setMode(XLineEditValidator::MODE mode)
@@ -31,7 +31,7 @@ void XLineEditValidator::setMode(XLineEditValidator::MODE mode)
     m_mode = mode;
 }
 
-void XLineEditValidator::setMaxValue(qint64 nValue)
+void XLineEditValidator::setMaxValue(quint64 nValue)
 {
     m_nMaxValue = nValue;
 }
@@ -52,46 +52,46 @@ QValidator::State XLineEditValidator::validate(QString &sInput, int &nPos) const
             (m_mode == MODE_DEC_16) || (m_mode == MODE_SIGN_DEC_16) || (m_mode == MODE_BIN_16) || (m_mode == MODE_HEX_32) || (m_mode == MODE_DEC_32) ||
             (m_mode == MODE_SIGN_DEC_32) || (m_mode == MODE_BIN_32) || (m_mode == MODE_HEX_64) || (m_mode == MODE_DEC_64) || (m_mode == MODE_SIGN_DEC_64) ||
             (m_mode == MODE_BIN_64)) {
-            qint64 nMax = 0;
-            qint64 nMin = 0;
+            // The unsigned modes are bounded by nMax alone; the signed mode carries
+            // its own pair. Keeping them in separate variables matters: a 64-bit
+            // unsigned bound does not survive a round trip through qint64, which is
+            // what used to make setMaxValue(0xFFFFFFFFFFFFFFFF) reject every input.
+            quint64 nMax = 0;
+            qint64 nSignedMax = 0;
+            qint64 nSignedMin = 0;
             qint32 nLenght = 0;
             // TODO Dec Lenght !!!
 
             // TODO optimize!
             if ((m_mode == MODE_HEX_8) || (m_mode == MODE_DEC_8) || (m_mode == MODE_BIN_8)) {
                 nMax = UCHAR_MAX;
-                nMin = 0;
             } else if (m_mode == MODE_SIGN_DEC_8) {
-                nMax = SCHAR_MAX;
-                nMin = SCHAR_MIN;
+                nSignedMax = SCHAR_MAX;
+                nSignedMin = SCHAR_MIN;
             } else if ((m_mode == MODE_HEX_16) || (m_mode == MODE_DEC_16) || (m_mode == MODE_BIN_16)) {
                 nMax = USHRT_MAX;
-                nMin = 0;
             } else if (m_mode == MODE_SIGN_DEC_16) {
-                nMax = SHRT_MAX;
-                nMin = SHRT_MIN;
+                nSignedMax = SHRT_MAX;
+                nSignedMin = SHRT_MIN;
             } else if ((m_mode == MODE_HEX_32) || (m_mode == MODE_DEC_32) || (m_mode == MODE_BIN_32)) {
                 nMax = UINT_MAX;
-                nMin = 0;
             } else if (m_mode == MODE_SIGN_DEC_32) {
-                nMax = INT_MAX;
-                nMin = INT_MIN;
+                nSignedMax = INT_MAX;
+                nSignedMin = INT_MIN;
             } else if ((m_mode == MODE_HEX_64) || (m_mode == MODE_DEC_64) || (m_mode == MODE_BIN_64)) {
                 nMax = ULLONG_MAX;
-                nMin = 0;
             } else if (m_mode == MODE_SIGN_DEC_64) {
-                // TODO Check
-#ifdef LLONG_MAX
-                nMax = LLONG_MAX;
-                nMin = LLONG_MIN;
-#endif
-#ifdef LONG_LONG_MAX
-                nMax = LONG_LONG_MAX;
-                nMin = LONG_LONG_MIN;
-#endif
+                nSignedMax = LLONG_MAX;
+                nSignedMin = LLONG_MIN;
             }
 
             nMax = qMin(m_nMaxValue, nMax);
+
+            // m_nMaxValue is an unsigned bound, so it only ever tightens the
+            // positive half of a signed range.
+            if (m_nMaxValue < static_cast<quint64>(nSignedMax)) {
+                nSignedMax = static_cast<qint64>(m_nMaxValue);
+            }
 
             if (m_mode == MODE_HEX_8) {
                 nLenght = 2;
@@ -117,14 +117,8 @@ QValidator::State XLineEditValidator::validate(QString &sInput, int &nPos) const
                 bool bSuccess = false;
                 quint64 nValue = sInput.toULongLong(&bSuccess, 16);
 
-                if (bSuccess && (sInput.length() <= nLenght)) {
-                    if (m_mode != MODE_HEX_64) {
-                        if (static_cast<qint64>(nValue) <= nMax) {
-                            result = Acceptable;
-                        }
-                    } else {
-                        result = Acceptable;
-                    }
+                if (bSuccess && (sInput.length() <= nLenght) && (nValue <= nMax)) {
+                    result = Acceptable;
                 }
             } else if ((m_mode == MODE_DEC_8) || (m_mode == MODE_DEC_16) || (m_mode == MODE_DEC_32) || (m_mode == MODE_DEC_64)) {
                 result = Invalid;
@@ -132,14 +126,8 @@ QValidator::State XLineEditValidator::validate(QString &sInput, int &nPos) const
                 bool bSuccess = false;
                 quint64 nValue = sInput.toULongLong(&bSuccess, 10);
 
-                if (bSuccess) {
-                    if (m_mode != MODE_DEC_64) {
-                        if (static_cast<qint64>(nValue) <= nMax) {
-                            result = Acceptable;
-                        }
-                    } else {
-                        result = Acceptable;
-                    }
+                if (bSuccess && (nValue <= nMax)) {
+                    result = Acceptable;
                 }
             } else if ((m_mode == MODE_SIGN_DEC_8) || (m_mode == MODE_SIGN_DEC_16) || (m_mode == MODE_SIGN_DEC_32) || (m_mode == MODE_SIGN_DEC_64)) {
                 result = Invalid;
@@ -147,7 +135,7 @@ QValidator::State XLineEditValidator::validate(QString &sInput, int &nPos) const
                 bool bSuccess = false;
                 qint64 nValue = sInput.toLongLong(&bSuccess, 10);
 
-                if (bSuccess && (nValue <= nMax) && (nValue >= nMin)) {
+                if (bSuccess && (nValue <= nSignedMax) && (nValue >= nSignedMin)) {
                     result = Acceptable;
                 } else if (sInput == "-") {
                     result = Intermediate;
@@ -158,14 +146,8 @@ QValidator::State XLineEditValidator::validate(QString &sInput, int &nPos) const
                 bool bSuccess = false;
                 quint64 nValue = binStringToValue(sInput, &bSuccess);
 
-                if (bSuccess && (sInput.length() <= nLenght)) {
-                    if (m_mode != MODE_BIN_64) {
-                        if (static_cast<qint64>(nValue) <= nMax) {
-                            result = Acceptable;
-                        }
-                    } else {
-                        result = Acceptable;
-                    }
+                if (bSuccess && (sInput.length() <= nLenght) && (nValue <= nMax)) {
+                    result = Acceptable;
                 }
             }
         } else if (m_mode == MODE_DOUBLE) {

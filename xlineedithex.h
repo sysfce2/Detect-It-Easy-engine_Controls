@@ -82,7 +82,7 @@ public:
     //    qint64 getSignValue();
     QVariant _getValue();
 
-    void setMaxValue(qint64 nValue);
+    void setMaxValue(quint64 nValue);
 
     quint8 getValue_uint8();
     qint8 getValue_int8();
