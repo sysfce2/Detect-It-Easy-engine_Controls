@@ -116,9 +116,12 @@ void XTableView::setCustomModel(QAbstractItemModel *pModel, bool bFilterEnabled)
     m_pModel = pModel;
 
     if (pModel && bFilterEnabled) {
-        m_pHeaderView->setNumberOfFilters(pModel->columnCount());
         m_pSortFilterProxyModel->setSourceModel(pModel);
         replaceModel(m_pSortFilterProxyModel);
+        // After replaceModel: the header view can read headerData() through the
+        // proxy, so the filter line edits get real column names as placeholders
+        // instead of the generic "Filter column N" fallback.
+        m_pHeaderView->setNumberOfFilters(pModel->columnCount());
         // Column count can change later without a new setCustomModel() call (e.g.
         // XFModel_table interleaving presentation columns on setShowPresentation()).
         // Keep the header's per-column filter row in sync with it, or the stale
