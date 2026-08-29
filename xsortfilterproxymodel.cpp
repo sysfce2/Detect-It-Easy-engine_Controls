@@ -29,10 +29,8 @@ bool isNumericVariant(const QVariant &value)
         case QMetaType::UInt:
         case QMetaType::LongLong:
         case QMetaType::ULongLong:
-        case QMetaType::Double:
-            return true;
-        default:
-            return false;
+        case QMetaType::Double: return true;
+        default: return false;
     }
 }
 

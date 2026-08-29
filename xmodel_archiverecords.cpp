@@ -139,19 +139,21 @@ void XModel_ArchiveRecords::_initColumns()
 
         if (sName.isEmpty()) sName = QString("#%1").arg(static_cast<qint32>(fpartProp));
 
-        if ((fpartProp == XBinary::FPART_PROP_COMPRESSEDSIZE) || (fpartProp == XBinary::FPART_PROP_UNCOMPRESSEDSIZE) ||
-            (fpartProp == XBinary::FPART_PROP_STREAMOFFSET) || (fpartProp == XBinary::FPART_PROP_STREAMSIZE) || (fpartProp == XBinary::FPART_PROP_UNCOMPRESSEDCRC) ||
-            (fpartProp == XBinary::FPART_PROP_RESULTCRC) || (fpartProp == XBinary::FPART_PROP_UID) || (fpartProp == XBinary::FPART_PROP_GID))
+        if ((fpartProp == XBinary::FPART_PROP_COMPRESSEDSIZE) || (fpartProp == XBinary::FPART_PROP_UNCOMPRESSEDSIZE) || (fpartProp == XBinary::FPART_PROP_STREAMOFFSET) ||
+            (fpartProp == XBinary::FPART_PROP_STREAMSIZE) || (fpartProp == XBinary::FPART_PROP_UNCOMPRESSEDCRC) || (fpartProp == XBinary::FPART_PROP_RESULTCRC) ||
+            (fpartProp == XBinary::FPART_PROP_UID) || (fpartProp == XBinary::FPART_PROP_GID))
             nFlags = Qt::AlignVCenter | Qt::AlignRight;
         else nFlags = Qt::AlignVCenter | Qt::AlignLeft;
 
         if (fpartProp == XBinary::FPART_PROP_ORIGINALNAME) nSymbolSize = 20;
         else if (fpartProp == XBinary::FPART_PROP_OPTIONAL_PATH) nSymbolSize = 18;
         else if ((fpartProp == XBinary::FPART_PROP_DATETIME) || (fpartProp == XBinary::FPART_PROP_MTIME) || (fpartProp == XBinary::FPART_PROP_CTIME) ||
-                 (fpartProp == XBinary::FPART_PROP_ATIME)) nSymbolSize = 19;
+                 (fpartProp == XBinary::FPART_PROP_ATIME))
+            nSymbolSize = 19;
         else if (fpartProp == XBinary::FPART_PROP_ENCRYPTED) nSymbolSize = 9;
         else if ((fpartProp == XBinary::FPART_PROP_UNCOMPRESSEDCRC) || (fpartProp == XBinary::FPART_PROP_RESULTCRC) || (fpartProp == XBinary::FPART_PROP_UID) ||
-                 (fpartProp == XBinary::FPART_PROP_GID)) nSymbolSize = 10;
+                 (fpartProp == XBinary::FPART_PROP_GID))
+            nSymbolSize = 10;
         else nSymbolSize = 16;
 
         setColumnName(i, sName);
@@ -202,8 +204,7 @@ QVariant XModel_ArchiveRecords::data(const QModelIndex &index, int nRole) const
                         }
                     } else if (fpartProp == XBinary::FPART_PROP_FILEMODE) {
                         if (rec.mapProperties.contains(fpartProp)) {
-                            result = modeToString(rec.mapProperties.value(fpartProp).toUInt(),
-                                                  rec.mapProperties.value(XBinary::FPART_PROP_ISFOLDER).toBool());
+                            result = modeToString(rec.mapProperties.value(fpartProp).toUInt(), rec.mapProperties.value(XBinary::FPART_PROP_ISFOLDER).toBool());
                         }
                     } else if (fpartProp == XBinary::FPART_PROP_ENCRYPTED) {
                         if (rec.mapProperties.value(fpartProp).toBool()) {

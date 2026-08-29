@@ -137,7 +137,8 @@ void XFTableView::setData(const XBinary::INDATA &inData, const XBinary::XFHEADER
     }
 
     if (m_pTableView->selectionModel()) {
-        connect(m_pTableView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(onCurrentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
+        connect(m_pTableView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(onCurrentChanged(QModelIndex, QModelIndex)),
+                Qt::UniqueConnection);
     }
 
     m_bSortActive = false;

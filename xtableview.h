@@ -75,7 +75,11 @@ private:
     void replaceModel(QAbstractItemModel *pModel);
     void handleFilter();
 
-    enum PENDING_OPERATION { OPERATION_NONE = 0, OPERATION_FILTER, OPERATION_SORT };
+    enum PENDING_OPERATION {
+        OPERATION_NONE = 0,
+        OPERATION_FILTER,
+        OPERATION_SORT
+    };
 
     void startAsyncFilterOperation(const QList<QString> &listFilters);
     void startAsyncCustomFilterOperation(const QList<QString> &listFilters);

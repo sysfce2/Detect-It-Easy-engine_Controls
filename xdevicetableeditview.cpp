@@ -94,11 +94,9 @@ QList<XDeviceTableEditView::HIGHLIGHTREGION> XDeviceTableEditView::_convertBookm
     return listResult;
 }
 
-bool XDeviceTableEditView::adjustOffsetBookmarksAfterRemoval(QVector<XInfoDB::BOOKMARKRECORD> *pBookmarks, qint64 nOldSize,
-                                                              qint64 nRemoveOffset, qint64 nRemoveSize)
+bool XDeviceTableEditView::adjustOffsetBookmarksAfterRemoval(QVector<XInfoDB::BOOKMARKRECORD> *pBookmarks, qint64 nOldSize, qint64 nRemoveOffset, qint64 nRemoveSize)
 {
-    if (!pBookmarks || (nOldSize < 0) || (nRemoveOffset < 0) || (nRemoveSize <= 0) ||
-        (nRemoveOffset > nOldSize) || (nRemoveSize > (nOldSize - nRemoveOffset))) {
+    if (!pBookmarks || (nOldSize < 0) || (nRemoveOffset < 0) || (nRemoveSize <= 0) || (nRemoveOffset > nOldSize) || (nRemoveSize > (nOldSize - nRemoveOffset))) {
         return false;
     }
 
@@ -117,8 +115,7 @@ bool XDeviceTableEditView::adjustOffsetBookmarksAfterRemoval(QVector<XInfoDB::BO
         }
 
         const quint64 nBookmarkStart = record.nLocation;
-        if ((record.nSize <= 0) || (nBookmarkStart > (quint64)nOldSize) ||
-            ((quint64)record.nSize > ((quint64)nOldSize - nBookmarkStart))) {
+        if ((record.nSize <= 0) || (nBookmarkStart > (quint64)nOldSize) || ((quint64)record.nSize > ((quint64)nOldSize - nBookmarkStart))) {
             // Invalid imported offset bookmarks cannot be mapped reliably
             // across a structural edit. Drop them instead of persisting
             // overflowed or out-of-file ranges.
@@ -135,12 +132,8 @@ bool XDeviceTableEditView::adjustOffsetBookmarksAfterRemoval(QVector<XInfoDB::BO
         if (nBookmarkStart >= nRemoveEnd) {
             record.nLocation -= (quint64)nRemoveSize;
         } else {
-            const quint64 nRemainingBefore = nBookmarkStart < nRemoveStart
-                                                 ? nRemoveStart - nBookmarkStart
-                                                 : 0;
-            const quint64 nRemainingAfter = nBookmarkEnd > nRemoveEnd
-                                                ? nBookmarkEnd - nRemoveEnd
-                                                : 0;
+            const quint64 nRemainingBefore = nBookmarkStart < nRemoveStart ? nRemoveStart - nBookmarkStart : 0;
+            const quint64 nRemainingAfter = nBookmarkEnd > nRemoveEnd ? nBookmarkEnd - nRemoveEnd : 0;
             const quint64 nNewBookmarkSize = nRemainingBefore + nRemainingAfter;
 
             if (nNewBookmarkSize == 0) {
@@ -186,8 +179,8 @@ void XDeviceTableEditView::_editHex()
 void XDeviceTableEditView::_editPatch()
 {
     if (!isReadonly()) {
-        QString sJsonFileName =
-            QFileDialog::getOpenFileName(this, tr("Open file") + QString("..."), XBinary::getDeviceDirectory(getBinaryView()->getInData().pDevice), QString("%1 (*.patch.json)").arg(tr("Patch")));
+        QString sJsonFileName = QFileDialog::getOpenFileName(this, tr("Open file") + QString("..."), XBinary::getDeviceDirectory(getBinaryView()->getInData().pDevice),
+                                                             QString("%1 (*.patch.json)").arg(tr("Patch")));
 
         if (sJsonFileName != "") {
             DumpProcess dumpProcess;

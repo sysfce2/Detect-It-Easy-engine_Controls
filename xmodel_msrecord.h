@@ -45,8 +45,8 @@ public:
 
     XModel_MSRecord(QIODevice *pDevice, const XBinary::_MEMORY_MAP &memoryMap, QVector<XBinary::MS_RECORD> *pListRecods, XBinary::VT valueType,
                     QObject *pParent = nullptr);
-    XModel_MSRecord(const XBinary::INDATA &inData, const XBinary::_MEMORY_MAP &memoryMap, QVector<XBinary::MS_RECORD> *pListRecods,
-                    XBinary::VT valueType, QObject *pParent = nullptr);
+    XModel_MSRecord(const XBinary::INDATA &inData, const XBinary::_MEMORY_MAP &memoryMap, QVector<XBinary::MS_RECORD> *pListRecods, XBinary::VT valueType,
+                    QObject *pParent = nullptr);
     ~XModel_MSRecord() override;
 
     void setValue(XBinary::ENDIAN endian, XBinary::VT valueType, QVariant varValue);
@@ -88,9 +88,9 @@ private:
     QVector<QString> m_vecValueCache;
     bool m_bValueCacheValid;
     QVector<qint32> m_vecSortIndex;
-    QTemporaryFile m_valueStoreFile;             // Disk cache with the UTF-8 encoded string values; removed automatically
-    const uchar *m_pValueStoreMapped;            // Memory mapping of the store: immutable, safe for concurrent reads from the filter/sort threads
-    QVector<quint64> m_vecValueStoreIndex;       // Packed per record: (nOffset << 24) | nUtf8Length
+    QTemporaryFile m_valueStoreFile;        // Disk cache with the UTF-8 encoded string values; removed automatically
+    const uchar *m_pValueStoreMapped;       // Memory mapping of the store: immutable, safe for concurrent reads from the filter/sort threads
+    QVector<quint64> m_vecValueStoreIndex;  // Packed per record: (nOffset << 24) | nUtf8Length
 };
 
 #endif  // XMODEL_MSRECORD_H

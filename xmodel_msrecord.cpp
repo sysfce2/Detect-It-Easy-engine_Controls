@@ -118,8 +118,8 @@ XModel_MSRecord::XModel_MSRecord(QIODevice *pDevice, const XBinary::_MEMORY_MAP 
     _init(memoryMap, pListRecods, valueType);
 }
 
-XModel_MSRecord::XModel_MSRecord(const XBinary::INDATA &inData, const XBinary::_MEMORY_MAP &memoryMap, QVector<XBinary::MS_RECORD> *pListRecods,
-                                 XBinary::VT valueType, QObject *pParent)
+XModel_MSRecord::XModel_MSRecord(const XBinary::INDATA &inData, const XBinary::_MEMORY_MAP &memoryMap, QVector<XBinary::MS_RECORD> *pListRecods, XBinary::VT valueType,
+                                 QObject *pParent)
     : XModel(pParent)
 {
     m_inData = inData;
@@ -194,8 +194,7 @@ void XModel_MSRecord::setSignaturesList(QList<XBinary::SIGNATUREDB_RECORD> *pLis
 
 bool XModel_MSRecord::updateStringRecord(qint32 nRecordIndex, qint64 nSize, XBinary::VT valueType, const QString &sValue)
 {
-    if (!m_pListRecords || (nRecordIndex < 0) || (nRecordIndex >= m_pListRecords->size()) || (nSize < 0) ||
-        (nSize > (std::numeric_limits<quint16>::max)())) {
+    if (!m_pListRecords || (nRecordIndex < 0) || (nRecordIndex >= m_pListRecords->size()) || (nSize < 0) || (nSize > (std::numeric_limits<quint16>::max)())) {
         return false;
     }
 
@@ -594,7 +593,8 @@ void XModel_MSRecord::buildValueCache()
 
             if (!m_pListRecords->at(i).sValue.isEmpty()) {
                 sValue = m_pListRecords->at(i).sValue;
-            } else if ((m_valueType == XBinary::VT_STRING) || (m_valueType == XBinary::VT_A_I) || (m_valueType == XBinary::VT_U_I) || (m_valueType == XBinary::VT_UTF8_I)) {
+            } else if ((m_valueType == XBinary::VT_STRING) || (m_valueType == XBinary::VT_A_I) || (m_valueType == XBinary::VT_U_I) ||
+                       (m_valueType == XBinary::VT_UTF8_I)) {
                 const XBinary::MS_RECORD &record = m_pListRecords->at(i);
                 XBinary::VT valueType = m_valueType;
 
@@ -652,11 +652,9 @@ void XModel_MSRecord::buildValueCache()
                                 vecSwapped[j] = ((nCh >> 8) & 0xFF) | ((nCh << 8) & 0xFF00);
                             }
 
-                            sValue = QString::fromUtf16(
-                                reinterpret_cast<const char16_t *>(vecSwapped.constData()), nLen);
+                            sValue = QString::fromUtf16(reinterpret_cast<const char16_t *>(vecSwapped.constData()), nLen);
                         } else {
-                            sValue = QString::fromUtf16(
-                                reinterpret_cast<const char16_t *>(pUData), nLen);
+                            sValue = QString::fromUtf16(reinterpret_cast<const char16_t *>(pUData), nLen);
                         }
                     } else if ((valueType == XBinary::VT_UTF8) || (valueType == XBinary::VT_UTF8_I)) {
                         qint32 nLen = 0;
@@ -695,7 +693,8 @@ void XModel_MSRecord::buildValueCache()
 
             if (!m_pListRecords->at(i).sValue.isEmpty()) {
                 sValue = m_pListRecords->at(i).sValue;
-            } else if ((m_valueType == XBinary::VT_STRING) || (m_valueType == XBinary::VT_A_I) || (m_valueType == XBinary::VT_U_I) || (m_valueType == XBinary::VT_UTF8_I)) {
+            } else if ((m_valueType == XBinary::VT_STRING) || (m_valueType == XBinary::VT_A_I) || (m_valueType == XBinary::VT_U_I) ||
+                       (m_valueType == XBinary::VT_UTF8_I)) {
                 const XBinary::MS_RECORD &record = m_pListRecords->at(i);
                 XBinary::VT valueType = m_valueType;
 
